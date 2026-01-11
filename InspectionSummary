@@ -995,9 +995,9 @@ const getInitials = (name: string) =>
     .join("")
     .toUpperCase();
 const mockEvaluatorProfile = ref({
-  name: "Zoe Lumanta",
-  title: "Administrative Aide",
-  specialty: "Administrative Aide",
+  name: "",
+  title: "Chief Inspector",
+  specialty: "Chief Inspector",
 });
 const printSummary = () => window.print();
 const logout = () => console.log("Logout clicked");
