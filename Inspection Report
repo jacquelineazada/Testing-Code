@@ -1,0 +1,630 @@
+<template>
+  <v-app
+    class="bg-slate-50"
+    style="height: 100vh; overflow: hidden; font-family: Arial, Helvetica, sans-serif"
+  >
+    <v-app-bar
+      flat
+      color="white"
+      height="88"
+      class="elevation-4 border-b"
+      app
+      style="position: fixed; top: 0; z-index: 1006"
+    >
+      <v-container
+        fluid
+        class="d-flex align-center py-0 h-100"
+        style="max-width: 100%; padding-left: 24px; padding-right: 24px"
+      >
+        <div class="d-flex align-center">
+          <v-img
+            src="https://www2.naga.gov.ph/wp-content/uploads/2022/05/Naga_City_Official_Seal-1.png"
+            alt="LGU Seal"
+            width="85"
+            height="75"
+            contain
+            class="me-4"
+          />
+          <div>
+            <div
+              style="font-size: 12px; font-weight: 400; color: Black; line-height: 1.2"
+            >
+              REPUBLIC OF THE PHILIPPINES
+            </div>
+            <div
+              style="font-size: 14px; font-weight: 700; color: Black; line-height: 1.2"
+            >
+              CITY GOVERNMENT OF NAGA
+            </div>
+          </div>
+        </div>
+        <v-spacer></v-spacer>
+        <div class="d-flex align-center">
+          <v-menu location="bottom end">
+            <template #activator="{ props }">
+              <v-btn
+                variant="text"
+                style="background-color: transparent; box-shadow: none; padding: 0"
+                v-bind="props"
+              >
+                <v-avatar size="32" class="mx-2" color="blue-darken-2">
+                  <span class="text-white font-weight-bold text-caption">{{
+                    getInitials(mockEvaluatorProfile.name)
+                  }}</span>
+                </v-avatar>
+                <div class="d-flex flex-column text-left">
+                  <span
+                    class="font-weight-bold"
+                    style="color: #555; white-space: nowrap; font-size: 14px"
+                    >{{ mockEvaluatorProfile.name }}</span
+                  >
+                  <span style="color: #888; white-space: nowrap; font-size: 12px">{{
+                    mockEvaluatorProfile.title
+                  }}</span>
+                </div>
+                <v-icon class="ml-1" size="small">mdi-chevron-down</v-icon>
+              </v-btn>
+            </template>
+            <v-card min-width="200" class="mt-1 border shadow-sm">
+              <v-list density="compact" nav>
+                <v-list-item>
+                  <v-list-item-title class="font-weight-bold">{{
+                    mockEvaluatorProfile.name
+                  }}</v-list-item-title>
+                  <v-list-item-subtitle>{{
+                    mockEvaluatorProfile.specialty
+                  }}</v-list-item-subtitle>
+                </v-list-item>
+                <v-divider class="my-1"></v-divider>
+                <v-list-item link @click="logout" class="text-red-darken-1">
+                  <template #prepend><v-icon>mdi-logout</v-icon></template>
+                  <v-list-item-title>Log Out</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-card>
+          </v-menu>
+        </div>
+      </v-container>
+    </v-app-bar>
+
+    <v-main
+      class="bg-grey-lighten-5"
+      style="padding-top: 88px; height: 100vh; overflow-y: auto"
+    >
+      <div class="page-container px-3 pb-8 mt-6">
+        <div class="mb-4 px-2">
+          <v-btn color="blue-darken-2" variant="text" class="mb-2" @click="goBack">
+            <v-icon start>mdi-arrow-left</v-icon> Back
+          </v-btn>
+        </div>
+
+        <v-card
+          class="rounded-xl border-0 shadow-sm overflow-hidden"
+          color="white"
+          min-height="800"
+        >
+          <v-tabs
+            v-model="activeTab"
+            color="primary"
+            bg-color="white"
+            class="border-b px-6"
+            height="60"
+          >
+            <v-tab
+              value="application"
+              class="font-weight-medium text-capitalize"
+              style="font-size: 16px"
+            >
+              <v-icon start icon="mdi-file-document-outline" class="mr-2"></v-icon>
+              Applicant Details
+            </v-tab>
+            <v-tab
+              value="inspection-report"
+              class="font-weight-medium text-capitalize"
+              style="font-size: 16px"
+            >
+              <v-icon start icon="mdi-clipboard-check-outline" class="mr-2"></v-icon>
+              Inspection Report
+            </v-tab>
+          </v-tabs>
+
+          <div class="pa-6 pa-md-8 bg-white gov-body">
+            <v-window v-model="activeTab">
+              <v-window-item value="application">
+                <v-row>
+                  <v-col cols="12">
+                    <v-card class="rounded-lg border mb-6" flat>
+                      <v-card-title
+                        class="bg-blue-lighten-5 text-blue-darken-3 font-weight-bold py-3"
+                        style="font-size: 20px"
+                      >
+                        <v-icon start class="mr-2">mdi-certificate-outline</v-icon>
+                        Permit Information
+                      </v-card-title>
+                      <v-card-text class="pa-6">
+                        <v-row>
+                          <v-col cols="12" md="4">
+                            <div class="mb-4">
+                              <div class="label-style">BP No.:</div>
+                              <div class="value-style">
+                                {{ permitInfo.bpNo || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Issued On:</div>
+                              <div class="value-style">
+                                {{ permitInfo.bpIssuedOn || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="4">
+                            <div class="mb-4">
+                              <div class="label-style">OP No.:</div>
+                              <div class="value-style">
+                                {{ permitInfo.opNo || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Issued On:</div>
+                              <div class="value-style">
+                                {{ permitInfo.opIssuedOn || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="4">
+                            <div class="label-style">Type of Application:</div>
+                            <div class="value-style text-blue-darken-2">
+                              {{ permitInfo.applicationType || "---" }}
+                            </div>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
+
+                    <v-card class="rounded-lg border mb-6" flat>
+                      <v-card-title
+                        class="bg-blue-lighten-5 text-blue-darken-3 font-weight-bold py-3"
+                        style="font-size: 20px"
+                      >
+                        <v-icon start class="mr-2">mdi-account-outline</v-icon>
+                        Application Information
+                      </v-card-title>
+                      <v-card-text class="pa-6">
+                        <v-row>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Applicant Name:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.applicantName || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Address:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.address || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Project Name:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.projectName || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">TCT No.:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.tctNo || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Enterprise Name:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.enterpriseName || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Form of Ownership:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.formOfOwnership || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Location:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.location || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">TD No.:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.tdNo || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
+
+                    <v-card class="rounded-lg border mb-6" flat>
+                      <v-card-title
+                        class="bg-blue-lighten-5 text-blue-darken-3 font-weight-bold py-3"
+                        style="font-size: 20px"
+                      >
+                        <v-icon start class="mr-2">mdi-home-city-outline</v-icon>
+                        Project Details
+                      </v-card-title>
+                      <v-card-text class="pa-6">
+                        <v-row>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Use/Character of Occupancy:</div>
+                              <div class="value-style">
+                                {{ projectDetails.occupancyUse || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Total Floor Area (sqm):</div>
+                              <div class="value-style">
+                                {{ projectDetails.totalFloorArea || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">No. of Units:</div>
+                              <div class="value-style">
+                                {{ projectDetails.noOfUnits || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Start of Construction:</div>
+                              <div class="value-style">
+                                {{ projectDetails.startOfConstruction || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Scope of Work:</div>
+                              <div class="value-style">
+                                {{ projectDetails.scopeOfWork || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">No. of Storey/s:</div>
+                              <div class="value-style">
+                                {{ projectDetails.noOfStoreys || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Completion Date:</div>
+                              <div class="value-style">
+                                {{ projectDetails.completionDate || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
+
+                    <v-card class="rounded-lg border" flat>
+                      <v-card-title
+                        class="bg-blue-lighten-5 text-blue-darken-3 font-weight-bold py-3"
+                        style="font-size: 20px"
+                      >
+                        <v-icon start class="mr-2">mdi-cash-multiple</v-icon>
+                        Summary of Actual Cost
+                      </v-card-title>
+                      <v-card-text class="pa-6">
+                        <v-row class="mb-6">
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Materials:</div>
+                              <div class="value-style">
+                                {{ actualCost.materials || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Equipment:</div>
+                              <div class="value-style">
+                                {{ actualCost.equipment || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Direct Labor:</div>
+                              <div class="value-style">
+                                {{ actualCost.directLabor || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Total Cost:</div>
+                              <div class="value-style">
+                                {{ actualCost.totalCost || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Other Cost:</div>
+                              <div class="value-style">
+                                {{ actualCost.otherCost || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                        </v-row>
+
+                        <v-divider class="mb-6"></v-divider>
+
+                        <div
+                          class="text-subtitle-1 font-weight-bold text-blue-darken-3 mb-4"
+                        >
+                          <v-icon start class="mr-2">mdi-account-hard-hat</v-icon>
+                          Full Time Supervising Professional
+                        </div>
+                        <v-row>
+                          <v-col cols="12" class="mb-4">
+                            <div class="label-style">Name:</div>
+                            <div class="value-style">
+                              {{ supervisingProf.name || "---" }}
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">PRC No:</div>
+                              <div class="value-style">
+                                {{ supervisingProf.prcNo || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Validity:</div>
+                              <div class="value-style">
+                                {{ supervisingProf.prcValidity || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">PTR No:</div>
+                              <div class="value-style">
+                                {{ supervisingProf.ptrNo || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Validity:</div>
+                              <div class="value-style">
+                                {{ supervisingProf.ptrValidity || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-window-item>
+
+              <!-- Tab 2: Inspection Report -->
+              <v-window-item value="inspection-report">
+                <v-row>
+                  <v-col cols="12" md="7" lg="8">
+                    <v-card
+                      flat
+                      class="rounded-lg border d-flex align-center justify-center bg-white"
+                      height="600"
+                    >
+                      <div class="text-center">
+                        <v-icon size="64" color="grey-lighten-1" class="mb-4"
+                          >mdi-file-document-outline</v-icon
+                        >
+                        <h2 class="text-h5 font-weight-bold text-grey-darken-1">
+                          Architectural Plan Placeholder
+                        </h2>
+                        <p class="text-caption text-grey">
+                          PDF/Image Viewer Integration Area
+                        </p>
+                      </div>
+                    </v-card>
+                  </v-col>
+
+                  <v-col cols="12" md="5" lg="4">
+                    <v-card
+                      flat
+                      class="rounded-xl border d-flex flex-column bg-white"
+                      height="600"
+                    >
+                      <div class="pa-4 pb-2">
+                        <h3 class="text-caption font-weight-bold text-blue-darken-3">
+                          Architectural Works Inspection Report
+                        </h3>
+                      </div>
+
+                      <v-card-text class="overflow-y-auto px-5 py-0 flex-grow-1">
+                        <div
+                          v-for="(item, i) in inspectionRequirements"
+                          :key="i"
+                          class="checklist-item-wrapper"
+                        >
+                          <v-checkbox
+                            v-model="checkedRequirements"
+                            :value="item"
+                            color="blue-darken-3"
+                            hide-details
+                            density="compact"
+                            class="inspection-checkbox"
+                          >
+                            <template #label>
+                              <span class="text-body-2 text-grey-darken-3">{{
+                                item
+                              }}</span>
+                            </template>
+                          </v-checkbox>
+                          <v-textarea
+                            v-model="inspectionRemarks[item]"
+                            placeholder="Add your remarks here..."
+                            variant="outlined"
+                            density="compact"
+                            hide-details
+                            rows="2"
+                            class="ml-8 mt-1 mb-2 rounded-lg reason-input"
+                            bg-color="white"
+                          ></v-textarea>
+                        </div>
+                      </v-card-text>
+
+                      <v-divider></v-divider>
+                      <v-card-actions class="pa-4 bg-white d-flex justify-end">
+                        <v-btn
+                          color="blue-darken-2"
+                          variant="flat"
+                          class="text-none font-weight-bold px-6"
+                          rounded="lg"
+                          @click="submitReport"
+                          size="small"
+                        >
+                          Submit Report
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-window-item>
+            </v-window>
+          </div>
+        </v-card>
+      </div>
+    </v-main>
+  </v-app>
+</template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const activeTab = ref("application");
+
+const permitInfo = ref({
+  bpNo: "",
+  bpIssuedOn: "",
+  opNo: "",
+  opIssuedOn: "",
+  applicationType: "",
+});
+
+const applicantDetails = ref({
+  applicantName: "",
+  address: "",
+  projectName: "",
+  location: "",
+  tctNo: "",
+  enterpriseName: "",
+  formOfOwnership: "",
+  tdNo: "",
+});
+
+const projectDetails = ref({
+  occupancyUse: "",
+  totalFloorArea: "",
+  noOfUnits: "",
+  startOfConstruction: "",
+  scopeOfWork: "",
+  noOfStoreys: "",
+  completionDate: "",
+});
+
+const actualCost = ref({
+  materials: "",
+  equipment: "",
+  directLabor: "",
+  totalCost: "",
+  otherCost: "",
+});
+
+const supervisingProf = ref({
+  name: "",
+  prcNo: "",
+  prcValidity: "",
+  ptrNo: "",
+  ptrValidity: "",
+});
+
+const mockEvaluatorProfile = ref({
+  name: "",
+  title: "Architect",
+  specialty: "Architect",
+});
+
+// Inspection Report Tab Data
+const checkedRequirements = ref<string[]>([]);
+const inspectionRemarks = ref<Record<string, string>>({});
+
+const inspectionRequirements = [
+  "Site Development Setting",
+  "Fire Safety Requirements",
+  "Occupancy/Use & Functionalities",
+  "Architectural Deficiencies & Parking Requirements",
+  "Light & Ventilation",
+  "Accessories Control Location",
+  "BP 344 Requirements",
+  "Mechanical Requirements",
+];
+
+const getInitials = (name: string) =>
+  name
+    ? name
+        .split(" ")
+        .map((p) => p[0])
+        .join("")
+        .toUpperCase()
+    : "??";
+
+const logout = () => console.log("Logout clicked");
+const goBack = () => router.back();
+const submitReport = () => alert("Report Submitted Successfully");
+</script>
+
+<style scoped>
+.gov-body {
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+.page-container {
+  max-width: 1460px;
+  margin: 0 auto;
+}
+
+.label-style {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #757575;
+  margin-bottom: 4px;
+}
+
+.value-style {
+  font-size: 16px;
+  font-weight: 700;
+  color: #212121;
+}
+
+.reason-input :deep(.v-field__input) {
+  font-size: 12px !important;
+  min-height: 28px !important;
+  padding: 4px 8px !important;
+}
+
+.checklist-item-wrapper {
+  margin-bottom: 2px;
+}
+
+.inspection-checkbox :deep(.v-selection-control) {
+  min-height: 24px !important;
+}
+
+.inspection-checkbox :deep(.v-label) {
+  font-size: 12px !important;
+  opacity: 1 !important;
+  padding-inline-start: 8px !important;
+}
+</style>
