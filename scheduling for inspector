@@ -1,0 +1,1264 @@
+<template>
+  <v-app
+    class="bg-slate-50"
+    style="height: 100vh; overflow: hidden; font-family: Arial, Helvetica, sans-serif"
+  >
+    <v-app-bar
+      flat
+      color="white"
+      height="88"
+      class="elevation-4 border-b"
+      app
+      style="position: fixed; top: 0; z-index: 1006"
+    >
+      <v-container
+        fluid
+        class="d-flex align-center py-0 h-100"
+        style="max-width: 100%; padding-left: 24px; padding-right: 24px"
+      >
+        <div class="d-flex align-center">
+          <v-img
+            src="https://www2.naga.gov.ph/wp-content/uploads/2022/05/Naga_City_Official_Seal-1.png"
+            alt="LGU Seal"
+            width="85"
+            height="75"
+            contain
+            class="me-4"
+          />
+          <div>
+            <div
+              style="font-size: 12px; font-weight: 400; color: Black; line-height: 1.2"
+            >
+              REPUBLIC OF THE PHILIPPINES
+            </div>
+            <div
+              style="font-size: 14px; font-weight: 700; color: Black; line-height: 1.2"
+            >
+              CITY GOVERNMENT OF NAGA
+            </div>
+          </div>
+        </div>
+        <v-spacer></v-spacer>
+        <div class="d-flex align-center">
+          <v-menu location="bottom end">
+            <template #activator="{ props }">
+              <v-btn
+                variant="text"
+                style="background-color: transparent; box-shadow: none; padding: 0"
+                v-bind="props"
+              >
+                <v-avatar size="32" class="mx-2" color="blue-darken-2">
+                  <span class="text-white font-weight-bold text-caption">{{
+                    getInitials(mockEvaluatorProfile.name)
+                  }}</span>
+                </v-avatar>
+                <div class="d-flex flex-column text-left">
+                  <span
+                    class="font-weight-bold"
+                    style="color: #555; white-space: nowrap; font-size: 14px"
+                    >{{ mockEvaluatorProfile.name }}</span
+                  >
+                  <span style="color: #888; white-space: nowrap; font-size: 12px">{{
+                    mockEvaluatorProfile.title
+                  }}</span>
+                </div>
+                <v-icon class="ml-1" size="small">mdi-chevron-down</v-icon>
+              </v-btn>
+            </template>
+            <v-card min-width="200" class="mt-1 border shadow-sm">
+              <v-list density="compact" nav>
+                <v-list-item>
+                  <v-list-item-title class="font-weight-bold">{{
+                    mockEvaluatorProfile.name
+                  }}</v-list-item-title>
+                  <v-list-item-subtitle>{{
+                    mockEvaluatorProfile.specialty
+                  }}</v-list-item-subtitle>
+                </v-list-item>
+                <v-divider class="my-1"></v-divider>
+                <v-list-item link @click="logout" class="text-red-darken-1">
+                  <template #prepend><v-icon>mdi-logout</v-icon></template>
+                  <v-list-item-title>Log Out</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-card>
+          </v-menu>
+        </div>
+      </v-container>
+    </v-app-bar>
+
+    <v-main
+      class="bg-grey-lighten-5"
+      style="padding-top: 88px; height: 100vh; overflow-y: auto"
+    >
+      <div class="page-container px-3 pb-8 mt-6">
+        <div class="mb-4 px-2">
+          <v-btn color="blue-darken-2" variant="text" class="mb-2" @click="goBack">
+            <v-icon start>mdi-arrow-left</v-icon> Back
+          </v-btn>
+        </div>
+
+        <v-card
+          class="rounded-xl border-0 shadow-sm overflow-hidden"
+          color="white"
+          min-height="800"
+        >
+          <v-tabs
+            v-model="activeTab"
+            color="primary"
+            bg-color="white"
+            class="border-b px-6"
+            height="60"
+          >
+            <v-tab
+              value="application"
+              class="font-weight-medium text-capitalize"
+              style="font-size: 16px"
+            >
+              <v-icon start icon="mdi-file-document-outline" class="mr-2"></v-icon>
+              Applicant Details
+            </v-tab>
+            <v-tab
+              value="checklist"
+              class="font-weight-medium text-capitalize"
+              style="font-size: 16px"
+            >
+              <v-icon start icon="mdi-format-list-checks" class="mr-2"></v-icon> Checklist
+            </v-tab>
+            <v-tab
+              value="schedule"
+              class="font-weight-medium text-capitalize"
+              style="font-size: 16px"
+            >
+              <v-icon start icon="mdi-calendar-check" class="mr-2"></v-icon> Inspection
+              Schedule
+            </v-tab>
+          </v-tabs>
+
+          <div class="pa-6 pa-md-8 bg-white gov-body">
+            <v-window v-model="activeTab">
+              <v-window-item value="application">
+                <v-row>
+                  <v-col cols="12">
+                    <v-card class="rounded-lg border mb-6" flat>
+                      <v-card-title
+                        class="bg-blue-lighten-5 text-blue-darken-3 font-weight-bold py-3"
+                        style="font-size: 20px"
+                      >
+                        <v-icon start class="mr-2">mdi-certificate-outline</v-icon>
+                        Permit Information
+                      </v-card-title>
+                      <v-card-text class="pa-6">
+                        <v-row>
+                          <v-col cols="12" md="4">
+                            <div class="mb-4">
+                              <div class="label-style">BP No.:</div>
+                              <div class="value-style">
+                                {{ permitInfo.bpNo || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Issued On:</div>
+                              <div class="value-style">
+                                {{ permitInfo.bpIssuedOn || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="4">
+                            <div class="mb-4">
+                              <div class="label-style">OP No.:</div>
+                              <div class="value-style">
+                                {{ permitInfo.opNo || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Issued On:</div>
+                              <div class="value-style">
+                                {{ permitInfo.opIssuedOn || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="4">
+                            <div class="label-style">Type of Application:</div>
+                            <div class="value-style text-blue-darken-2">
+                              {{ permitInfo.applicationType || "---" }}
+                            </div>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
+
+                    <v-card class="rounded-lg border mb-6" flat>
+                      <v-card-title
+                        class="bg-blue-lighten-5 text-blue-darken-3 font-weight-bold py-3"
+                        style="font-size: 20px"
+                      >
+                        <v-icon start class="mr-2">mdi-account-outline</v-icon>
+                        Application Information
+                      </v-card-title>
+                      <v-card-text class="pa-6">
+                        <v-row>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Applicant Name:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.applicantName || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Address:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.address || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Project Name:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.projectName || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">TCT No.:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.tctNo || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Enterprise Name:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.enterpriseName || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Form of Ownership:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.formOfOwnership || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Location:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.location || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">TD No.:</div>
+                              <div class="value-style">
+                                {{ applicantDetails.tdNo || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
+
+                    <v-card class="rounded-lg border mb-6" flat>
+                      <v-card-title
+                        class="bg-blue-lighten-5 text-blue-darken-3 font-weight-bold py-3"
+                        style="font-size: 20px"
+                      >
+                        <v-icon start class="mr-2">mdi-home-city-outline</v-icon>
+                        Project Details
+                      </v-card-title>
+                      <v-card-text class="pa-6">
+                        <v-row>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Use/Character of Occupancy:</div>
+                              <div class="value-style">
+                                {{ projectDetails.occupancyUse || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Total Floor Area (sqm):</div>
+                              <div class="value-style">
+                                {{ projectDetails.totalFloorArea || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">No. of Units:</div>
+                              <div class="value-style">
+                                {{ projectDetails.noOfUnits || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Start of Construction:</div>
+                              <div class="value-style">
+                                {{ projectDetails.startOfConstruction || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Scope of Work:</div>
+                              <div class="value-style">
+                                {{ projectDetails.scopeOfWork || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">No. of Storey/s:</div>
+                              <div class="value-style">
+                                {{ projectDetails.noOfStoreys || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Completion Date:</div>
+                              <div class="value-style">
+                                {{ projectDetails.completionDate || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
+
+                    <v-card class="rounded-lg border" flat>
+                      <v-card-title
+                        class="bg-blue-lighten-5 text-blue-darken-3 font-weight-bold py-3"
+                        style="font-size: 20px"
+                      >
+                        <v-icon start class="mr-2">mdi-cash-multiple</v-icon>
+                        Summary of Actual Cost
+                      </v-card-title>
+                      <v-card-text class="pa-6">
+                        <v-row class="mb-6">
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Materials:</div>
+                              <div class="value-style">
+                                {{ actualCost.materials || "---" }}
+                              </div>
+                            </div>
+                            <div class="mb-4">
+                              <div class="label-style">Equipment:</div>
+                              <div class="value-style">
+                                {{ actualCost.equipment || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Direct Labor:</div>
+                              <div class="value-style">
+                                {{ actualCost.directLabor || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">Total Cost:</div>
+                              <div class="value-style">
+                                {{ actualCost.totalCost || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Other Cost:</div>
+                              <div class="value-style">
+                                {{ actualCost.otherCost || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                        </v-row>
+
+                        <v-divider class="mb-6"></v-divider>
+
+                        <div
+                          class="text-subtitle-1 font-weight-bold text-blue-darken-3 mb-4"
+                        >
+                          <v-icon start class="mr-2">mdi-account-hard-hat</v-icon>
+                          Full Time Supervising Professional
+                        </div>
+                        <v-row>
+                          <v-col cols="12" class="mb-4">
+                            <div class="label-style">Name:</div>
+                            <div class="value-style">
+                              {{ supervisingProf.name || "---" }}
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">PRC No:</div>
+                              <div class="value-style">
+                                {{ supervisingProf.prcNo || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Validity:</div>
+                              <div class="value-style">
+                                {{ supervisingProf.prcValidity || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <div class="mb-4">
+                              <div class="label-style">PTR No:</div>
+                              <div class="value-style">
+                                {{ supervisingProf.ptrNo || "---" }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="label-style">Validity:</div>
+                              <div class="value-style">
+                                {{ supervisingProf.ptrValidity || "---" }}
+                              </div>
+                            </div>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-window-item>
+
+              <v-window-item value="checklist">
+                <v-row>
+                  <v-col cols="12">
+                    <div
+                      v-for="(section, sIndex) in documentaryData.sections"
+                      :key="sIndex"
+                      class="mb-8"
+                    >
+                      <div class="d-flex align-center justify-space-between mb-4">
+                        <span class="text-subtitle-1 font-weight-bold">{{
+                          section.title
+                        }}</span>
+                        <v-chip
+                          color="success"
+                          variant="flat"
+                          size="small"
+                          class="font-weight-bold"
+                        >
+                          <v-icon start size="16">mdi-check-circle</v-icon>
+                          Complete
+                        </v-chip>
+                      </div>
+                      <v-row dense>
+                        <v-col
+                          cols="12"
+                          v-for="(item, iIndex) in section.items"
+                          :key="iIndex"
+                        >
+                          <div class="checklist-item-wrapper">
+                            <v-checkbox
+                              :model-value="true"
+                              color="blue-darken-2"
+                              hide-details
+                              density="compact"
+                              class="custom-checkbox-checked"
+                              readonly
+                            >
+                              <template #label>
+                                <span style="color: #000000; font-size: 16px">{{
+                                  item.text
+                                }}</span>
+                              </template>
+                            </v-checkbox>
+                          </div>
+                        </v-col>
+                      </v-row>
+                    </div>
+
+                    <!-- What's Next Section -->
+                    <v-card class="whats-next-card mt-6" flat>
+                      <v-card-text class="pa-5">
+                        <div class="d-flex align-center mb-4">
+                          <v-icon color="blue-darken-2" class="mr-2"
+                            >mdi-information-outline</v-icon
+                          >
+                          <span class="text-subtitle-1 font-weight-bold"
+                            >What's Next?</span
+                          >
+                        </div>
+
+                        <div class="next-step-item mb-4">
+                          <div class="d-flex align-start">
+                            <v-avatar color="blue-darken-2" size="28" class="mr-3 mt-1">
+                              <span
+                                class="text-white font-weight-bold"
+                                style="font-size: 14px"
+                                >1</span
+                              >
+                            </v-avatar>
+                            <div>
+                              <div class="font-weight-bold" style="font-size: 15px">
+                                Checklist Verification Complete
+                              </div>
+                              <div class="text-grey-darken-1" style="font-size: 14px">
+                                All required documents have been verified and marked as
+                                complete.
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="next-step-item mb-4">
+                          <div class="d-flex align-start">
+                            <v-avatar color="blue-darken-2" size="28" class="mr-3 mt-1">
+                              <span
+                                class="text-white font-weight-bold"
+                                style="font-size: 14px"
+                                >2</span
+                              >
+                            </v-avatar>
+                            <div>
+                              <div class="font-weight-bold" style="font-size: 15px">
+                                Schedule On-site Inspection
+                              </div>
+                              <div class="text-grey-darken-1" style="font-size: 14px">
+                                Set an inspection schedule and assign qualified inspectors
+                                to each category.
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <v-divider class="my-3"></v-divider>
+
+                        <div class="text-grey-darken-1" style="font-size: 13px">
+                          <span class="font-weight-bold">Note:</span> You can monitor the
+                          inspection schedule status in the "Inspection Schedule" tab
+                          above.
+                        </div>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-window-item>
+
+              <!-- Tab 3: Inspection Schedule -->
+              <v-window-item value="schedule">
+                <v-card class="rounded-lg border" flat>
+                  <v-card-title
+                    class="bg-blue-lighten-5 text-blue-darken-3 font-weight-bold py-3"
+                    style="font-size: 20px"
+                  >
+                    <v-icon start class="mr-2">mdi-calendar-check</v-icon>
+                    Inspection Schedule
+                  </v-card-title>
+
+                  <v-card-text class="pa-6">
+                    <div v-if="inspectionDetails.date">
+                      <!-- Schedule Info -->
+                      <div class="mb-6">
+                        <h3 class="section-header">
+                          <v-icon class="mr-2" size="18">mdi-calendar-clock</v-icon>
+                          Schedule Details
+                        </h3>
+                        <v-row class="mt-4">
+                          <v-col cols="12" sm="6">
+                            <div class="label-style">INSPECTION DATE</div>
+                            <div class="value-style">
+                              {{ formatDate(inspectionDetails.date) }}
+                            </div>
+                          </v-col>
+                          <v-col cols="12" sm="6">
+                            <div class="label-style">INSPECTION TIME</div>
+                            <div class="value-style">
+                              {{ formatTime(inspectionDetails.time) }}
+                            </div>
+                          </v-col>
+                        </v-row>
+                      </div>
+
+                      <!-- Schedule Monitoring -->
+                      <div>
+                        <h3 class="section-header">
+                          <v-icon class="mr-2" size="18"
+                            >mdi-chart-timeline-variant</v-icon
+                          >
+                          Assign Inspectors
+                        </h3>
+                        <div class="mt-4">
+                          <div
+                            v-for="(detail, key) in inspectionDetails.works"
+                            :key="key"
+                            class="monitor-item"
+                          >
+                            <div class="d-flex justify-space-between align-center">
+                              <div class="d-flex align-center flex-grow-1">
+                                <v-icon
+                                  size="20"
+                                  class="mr-2"
+                                  :color="statusColors[detail.status]?.icon || '#f59e0b'"
+                                >
+                                  {{
+                                    detail.status === "Approved"
+                                      ? "mdi-check-circle"
+                                      : detail.status === "Rejected"
+                                      ? "mdi-close-circle"
+                                      : "mdi-alert-circle"
+                                  }}
+                                </v-icon>
+                                <span class="font-weight-medium">{{ detail.label }}</span>
+                              </div>
+                              <div class="d-flex align-center gap-2">
+                                <span
+                                  class="status-pill"
+                                  :style="
+                                    statusColors[detail.status]?.style || {
+                                      background: '#fef3c7',
+                                      color: '#92400e',
+                                    }
+                                  "
+                                >
+                                  {{ detail.status }}
+                                </span>
+                              </div>
+                            </div>
+                            <div class="inspector-name">{{ detail.inspector }}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="d-flex justify-end mt-6">
+                        <v-btn
+                          color="primary"
+                          class="text-none font-weight-bold px-8"
+                          rounded="lg"
+                          size="large"
+                        >
+                          Send Schedule
+                        </v-btn>
+                      </div>
+                    </div>
+
+                    <div v-else class="empty-state">
+                      <div class="empty-state-content">
+                        <v-icon color="#3b82f6" size="64">mdi-calendar-off</v-icon>
+                        <h3 class="empty-state-title mt-4 mb-2">
+                          No Inspection Scheduled
+                        </h3>
+                        <p class="empty-state-subtitle mb-6">
+                          Schedule an inspection by assigning inspectors and setting the
+                          date and time.
+                        </p>
+                        <v-btn
+                          color="primary"
+                          class="text-none font-weight-bold"
+                          prepend-icon="mdi-calendar-plus"
+                          @click="scheduleInspection"
+                        >
+                          Schedule Inspection
+                        </v-btn>
+                      </div>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-window-item>
+            </v-window>
+          </div>
+        </v-card>
+      </div>
+    </v-main>
+
+    <!-- Schedule Inspection Dialog -->
+    <v-dialog v-model="dialog" max-width="600px">
+      <v-card class="dialog-card">
+        <v-card-title class="dialog-header">
+          <v-icon class="mr-3" color="#fff">mdi-calendar-check</v-icon>
+          <span class="text-h6 font-weight-bold dialog-title">Schedule Inspection</span>
+          <v-spacer></v-spacer>
+          <v-btn icon variant="text" @click="dialog = false" size="small">
+            <v-icon color="#fff">mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-card-text class="pt-4">
+          <v-form @submit.prevent="submitSchedule">
+            <v-row class="mb-2">
+              <v-col cols="12" sm="6">
+                <v-label class="input-label">Date of Inspection</v-label>
+                <v-text-field
+                  v-model="inspectionDate"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  type="date"
+                  :min="minDate"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-label class="input-label">Time</v-label>
+                <v-text-field
+                  v-model="inspectionTime"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  type="time"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-label class="mt-4 mb-2 input-label">Assign Inspectors</v-label>
+            <v-row>
+              <v-col cols="12" sm="6">
+                <v-label class="input-label-small">Architectural Works</v-label>
+                <v-select
+                  v-model="inspectors.architectural"
+                  :items="inspectorsList.architectural"
+                  label="Select Inspector"
+                  density="compact"
+                  variant="outlined"
+                  hide-details
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-label class="input-label-small">Civil/Structural Works</v-label>
+                <v-select
+                  v-model="inspectors.civilStructural"
+                  :items="inspectorsList.civilStructural"
+                  label="Select Inspector"
+                  density="compact"
+                  variant="outlined"
+                  hide-details
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-label class="input-label-small">Electrical Works</v-label>
+                <v-select
+                  v-model="inspectors.electrical"
+                  :items="inspectorsList.electrical"
+                  label="Select Inspector"
+                  density="compact"
+                  variant="outlined"
+                  hide-details
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-label class="input-label-small">Sanitary Plumbing Works</v-label>
+                <v-select
+                  v-model="inspectors.sanitaryPlumbing"
+                  :items="inspectorsList.sanitaryPlumbing"
+                  label="Select Inspector"
+                  density="compact"
+                  variant="outlined"
+                  hide-details
+                ></v-select>
+              </v-col>
+            </v-row>
+
+            <div class="d-flex justify-end mt-4">
+              <v-btn
+                class="submit-btn"
+                type="submit"
+                size="default"
+                style="min-width: 150px"
+                >SET SCHEDULE</v-btn
+              >
+            </div>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+  </v-app>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+// Get today's date in YYYY-MM-DD format for min date restriction
+const minDate = computed(() => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+});
+const activeTab = ref("application");
+
+// navItems removed as they are no longer used
+
+const permitInfo = ref({
+  bpNo: "",
+  bpIssuedOn: "",
+  opNo: "",
+  opIssuedOn: "",
+  applicationType: "",
+});
+
+const applicantDetails = ref({
+  applicantName: "",
+  address: "",
+  projectName: "",
+  location: "",
+  tctNo: "",
+  enterpriseName: "",
+  formOfOwnership: "",
+  tdNo: "",
+});
+
+const projectDetails = ref({
+  occupancyUse: "",
+  totalFloorArea: "",
+  noOfUnits: "",
+  startOfConstruction: "",
+  scopeOfWork: "",
+  noOfStoreys: "",
+  completionDate: "",
+});
+
+const actualCost = ref({
+  materials: "",
+  equipment: "",
+  directLabor: "",
+  totalCost: "",
+  otherCost: "",
+});
+
+const supervisingProf = ref({
+  name: "",
+  prcNo: "",
+  prcValidity: "",
+  ptrNo: "",
+  ptrValidity: "",
+});
+
+const documentaryData = ref({
+  sections: [
+    {
+      title: "Occupancy Requirements Checklist",
+      items: [
+        {
+          text:
+            "Two (2) copies of accomplished Unified Application form for Certificate of Occupancy, duly notarized;",
+          checked: false,
+          remarks: "",
+        },
+        {
+          text: "Two (2) copies of Certificate of Completion, duly notarized;",
+          checked: false,
+          remarks: "",
+        },
+        {
+          text:
+            "Construction Logbook, signed and sealed by the Owner’s Architect or Civil Engineer who undertook full-time inspection and supervision;",
+          checked: false,
+          remarks: "",
+        },
+        {
+          text:
+            "Two (2) photocopies of the valid licenses of all involved professionals;",
+          checked: false,
+          remarks: "",
+        },
+        {
+          text:
+            "Photograph of the structure with substantial completion showing front, sides, and rear areas;",
+          checked: false,
+          remarks: "",
+        },
+        {
+          text:
+            "Two (2) sets of As-Built Plans, if there are changes in the building plans covered by the issued Building Permit;",
+          checked: false,
+          remarks: "",
+        },
+        {
+          text: "Two (2) copies of Certificate of Final Electrical Inspection;",
+          checked: false,
+          remarks: "",
+        },
+        {
+          text:
+            "Two (2) copies of Fire Safety Inspection Certificate from the Bureau of Fire and Protection;",
+          checked: false,
+          remarks: "",
+        },
+        {
+          text: "Sketch map indicating the location of the project;",
+          checked: false,
+          remarks: "",
+        },
+        {
+          text: "Others:",
+          checked: false,
+          remarks: "",
+        },
+      ],
+    },
+  ],
+});
+
+const mockEvaluatorProfile = ref({
+  name: "",
+  title: "Engineer",
+  specialty: "Engineer",
+});
+
+// Inspection Schedule Data
+const dialog = ref(false);
+const inspectionDate = ref(null);
+const inspectionTime = ref(null);
+const inspectors = ref({
+  architectural: null,
+  civilStructural: null,
+  electrical: null,
+  sanitaryPlumbing: null,
+});
+
+const inspectionDetails = ref({
+  date: null,
+  time: null,
+  works: {
+    architectural: {
+      label: "Architectural Works",
+      inspector: "",
+      status: "Pending",
+    },
+    civilStructural: {
+      label: "Civil/Structural Works",
+      inspector: "",
+      status: "Pending",
+    },
+    electrical: {
+      label: "Electrical Works",
+      inspector: "",
+      status: "Pending",
+    },
+    sanitaryPlumbing: {
+      label: "Sanitary Plumbing Works",
+      inspector: "",
+      status: "Pending",
+    },
+  },
+});
+
+const inspectorsList = {
+  architectural: ["Arch. Joyce Oberos", "Arch. Anne Dela Cruz", "Arch. Mark Villanueva"],
+  civilStructural: ["Eng. Roberto Martinez", "Eng. Brian Santos", "Eng. Lyka Gomez"],
+  electrical: ["Eng. Bernadette Veroza", "Eng. Claire Garcia", "Eng. John Paul Lim"],
+  sanitaryPlumbing: ["Eng. Andrew Villapane", "Eng. D. Reyes", "Eng. M. Fernandez"],
+};
+
+const statusColors: Record<string, { icon: string; style: Record<string, string> }> = {
+  Pending: {
+    icon: "#f59e0b",
+    style: { background: "#fef3c7", color: "#92400e" },
+  },
+  Approved: {
+    icon: "#10b981",
+    style: { background: "#d1fae5", color: "#065f46" },
+  },
+  Rejected: {
+    icon: "#ef4444",
+    style: { background: "#fee2e2", color: "#991b1b" },
+  },
+};
+
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split("-");
+  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).toLocaleDateString(
+    "en-US",
+    {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }
+  );
+};
+
+const formatTime = (timeString: string | null) => {
+  if (!timeString) return "";
+  const [hours, minutes] = timeString.split(":");
+  const date = new Date();
+  date.setHours(parseInt(hours), parseInt(minutes));
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
+const scheduleInspection = () => {
+  dialog.value = true;
+};
+
+const submitSchedule = () => {
+  if (
+    !inspectionDate.value ||
+    !inspectionTime.value ||
+    !inspectors.value.architectural ||
+    !inspectors.value.civilStructural ||
+    !inspectors.value.electrical ||
+    !inspectors.value.sanitaryPlumbing
+  ) {
+    alert("Please fill in all fields");
+    return;
+  }
+
+  inspectionDetails.value.date = inspectionDate.value;
+  inspectionDetails.value.time = inspectionTime.value;
+  inspectionDetails.value.works.architectural.inspector = inspectors.value.architectural;
+  inspectionDetails.value.works.architectural.status = "Pending";
+  inspectionDetails.value.works.civilStructural.inspector =
+    inspectors.value.civilStructural;
+  inspectionDetails.value.works.civilStructural.status = "Pending";
+  inspectionDetails.value.works.electrical.inspector = inspectors.value.electrical;
+  inspectionDetails.value.works.electrical.status = "Pending";
+  inspectionDetails.value.works.sanitaryPlumbing.inspector =
+    inspectors.value.sanitaryPlumbing;
+  inspectionDetails.value.works.sanitaryPlumbing.status = "Pending";
+
+  dialog.value = false;
+};
+
+const getInitials = (name: string) =>
+  name
+    ? name
+        .split(" ")
+        .map((p) => p[0])
+        .join("")
+        .toUpperCase()
+    : "??";
+const logout = () => console.log("Logout clicked");
+const goBack = () => router.back();
+const saveChecklist = () => alert("Checklist saved!");
+</script>
+
+<style scoped>
+.gov-header {
+  font-size: 36px !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+.gov-body {
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+.page-container {
+  max-width: 1460px;
+  margin: 0 auto;
+}
+
+.label-style {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #757575;
+  margin-bottom: 4px;
+}
+
+.value-style {
+  font-size: 16px;
+  font-weight: 700;
+  color: #212121;
+}
+
+/* What's Next Card Styles */
+.whats-next-card {
+  background-color: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  border-radius: 12px !important;
+}
+
+.next-step-item {
+  padding-left: 4px;
+}
+
+.custom-checkbox :deep(.v-label) {
+  opacity: 1;
+  font-size: 16px !important;
+}
+
+.custom-checkbox-checked :deep(.v-label) {
+  opacity: 1 !important;
+  font-size: 16px !important;
+  color: #000000 !important;
+}
+
+.custom-checkbox-checked :deep(.v-selection-control__input) {
+  color: #1565c0 !important;
+}
+
+.custom-checkbox-checked :deep(.v-checkbox .v-selection-control) {
+  opacity: 1 !important;
+}
+
+/* Inspection Schedule Tab Styles */
+.unified-tab-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.tab-header-section {
+  padding: 20px 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-title-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.tab-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  background: #3b82f6;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-icon {
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.tab-title-content {
+  flex: 1;
+}
+
+.tab-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.tab-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.tab-divider {
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.tab-content-section {
+  padding: 24px;
+}
+
+.content-section {
+  margin-bottom: 24px;
+}
+
+.section-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.info-field {
+  margin-bottom: 8px;
+}
+
+.field-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.field-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.monitor-item {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background: #fafafa;
+}
+
+.inspector-name {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 8px;
+  margin-left: 28px;
+}
+
+.status-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+}
+
+.empty-state-content {
+  max-width: 400px;
+}
+
+.empty-state-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.empty-state-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Dialog Styles */
+.dialog-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+}
+
+.dialog-title {
+  color: #ffffff;
+}
+
+.input-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.input-label-small {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.submit-btn {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.gap-2 {
+  gap: 8px;
+}
+</style>
